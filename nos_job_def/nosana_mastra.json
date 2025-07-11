@@ -5,13 +5,13 @@
       "args": {
         "gpu": true,
         "image": "docker.io/copstud3/github-reporter:latest",
+        "env": {
+          "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+        },
         "expose": [
           {
             "port": 8080
           }
-        ],
-        "entrypoint": [
-          "/bin/sh"
         ]
       },
       "type": "container/run"
