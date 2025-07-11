@@ -173,23 +173,34 @@ CMD ["/bin/sh", "-c", "ollama serve & sleep 5 && ollama pull qwen2.5:1.5b && nod
 **File: `nos_job_def/nosana_mastra.json`**
 ```json
 {
-  "version": "v1",
+  "ops": [
+    {
+      "id": "agents",
+      "args": {
+        "gpu": true,
+        "image": "docker.io/copstud3/github-reporter:latest",
+        "env": {
+          "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+        },
+        "expose": [
+          {
+            "port": 8080
+          }
+        ]
+      },
+      "type": "container/run"
+    }
+  ],
+  "meta": {
+    "trigger": "dashboard",
+    "system_requirements": {
+      "required_vram": 4
+    }
+  },
   "type": "container",
-  "spec": {
-    "image": "docker.io/copstud3/github-reporter:latest",
-    "env": {
-      "GITHUB_TOKEN": "${GITHUB_TOKEN}",
-      "API_BASE_URL": "http://127.0.0.1:11434/api",
-      "MODEL_NAME_AT_ENDPOINT": "qwen2.5:1.5b"
-    },
-    "resources": {
-      "gpu": false,
-      "memory": "512Mi",
-      "cpu": 1
-    },
-    "command": ["/bin/sh", "-c", "ollama serve & sleep 5 && ollama pull ${MODEL_NAME_AT_ENDPOINT} && node .mastra/output/index.mjs"]
-  }
+  "version": "0.1"
 }
+
 ```
 
 ### Deploying
@@ -205,47 +216,10 @@ CMD ["/bin/sh", "-c", "ollama serve & sleep 5 && ollama pull qwen2.5:1.5b && nod
    nosana job post --file nos_job_def/nosana_mastra.json --market nvidia-3060 --timeout 30
    ```
    Replace `your_token_here` with your GitHub PAT.
-4. **Check Status**:
-   ```bash
-   nosana job get <job-id>
-   ```
-   Note the job ID and endpoint (e.g., `https://<job-id>.nosana.io`).
-
-**Nosana Job ID**: [Insert job ID after deployment]  
-**Deployment Endpoint**: [Insert endpoint, e.g., `https://<job-id>.nosana.io`]
 
 
-## Example Usage in Mastra Playground
-### Public Repository
-- **Navigate**: `http://localhost:8080/tools/githubReporterAgent/get-github-stats`
-- **Input**:
-  ```json
-  {
-    "owner": "nosana-ci",
-    "repo": "agent-challenge"
-  }
-  ```
-- **Output**:
-  ```json
-  {
-    "summary": "GitHub Reporter: Analytics for repositories and owners\n\n📊 **Repository**: nosana-ci/agent-challenge\n⭐ **Key Statistics**\n- Name: agent-challenge\n- Stars: 10\n- Forks: 49\n- Open Issues: 0\n- Total Commits: 49\n- Primary Language: Rust\n- Last Commit: 2025-04-12T12:34:56Z\n- License: MIT\n\n👤 **Owner Profile**\n- Username: nosana-ci\n- Bio: Continuous Integration for Nosana\n- Followers: 120\n- Following: 15\n- Location: Amsterdam, Netherlands\n\n📝 **Summary**\n- Status: Active with recent commits\n- Activity: Stable Rust project\n\n⚠️ **Notes**\n- Public repository\n- Suggested README badge: ![Stars](https://img.shields.io/github/stars/nosana-ci/agent-challenge?style=social)"
-  }
-  ```
+**My Nosana Job ID**: [Github Reporter Agent](https://ejea7fcjtjdrnthmkx3saetu5njtazhnyfz3dc3frktj.node.k8s.prd.nos.ci/agents/githubReporterAgent/chat) 
 
-### Private Repository
-- **Input**:
-  ```json
-  {
-    "owner": "Nightburnn",
-    "repo": "summer-popup"
-  }
-  ```
-- **Output**:
-  ```json
-  {
-    "summary": "GitHub Reporter: Analytics for repositories and owners\n\n👤 **Owner Profile**\n- Username: Nightburnn\n- Bio: None\n- Followers: X\n- Following: Y\n- Location: None\n\n📝 **Summary**\n- Status: Repository inaccessible\n- Activity: No activity data available\n\n⚠️ **Notes**\n- Repository Nightburnn/summer-popup is private or does not exist\n- No user bio available"
-  }
-  ```
 
 
 ## Troubleshooting
